@@ -1,2 +1,2 @@
-from .agent import Agent
+from .robot import Robot
 from .kid import KidAgent
