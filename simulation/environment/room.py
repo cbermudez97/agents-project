@@ -1,6 +1,6 @@
 from random import randint, random
 
-from ..agents import Agent
+from ..agents import Robot
 from .env_actions import *
 
 
@@ -9,13 +9,15 @@ FreeCell, DirtyCell, CorralCell, ObstacleCell = range(4)
 
 # Env class
 class RoomEnv:
-    def __init__(self, rows, columns, nkids, nagents, nobstacles, ndirt, kid_mess_prob=0.4, rand_time=1000, agent_model = Agent, baby_model = Agent):
+    def __init__(self, rows, columns, nkids, nagents, nobstacles, ndirt, agent_model, baby_model, kid_mess_prob=0.4, rand_time=1000):
         self.floor = [ [FreeCell]*columns for _ in range(rows) ]
         self.kid_mess_prob = kid_mess_prob
         self.t = 0
         self.rt = rand_time
         self.kids = []
         self.agents = []
+
+        # Statistics
 
         # Add CorralCell
         x, y = 0, 0
@@ -129,7 +131,33 @@ class RoomEnv:
         return False
 
     def aply_agent_action(self, agent, action):
-        pass
+        if action >= DropKid and not agent.loading:
+            raise ValueError('Invalid action to be aplied by agent.')
+        mx = edx[action]
+        my = edx[action]
+        ax = agent.x
+        ay = agent.y
+        if action == Hold:
+            return
+        elif action == Clean:
+            if self.floor[ax][ay] == DirtyCell:
+                self.floor[ax][ay] = FreeCell
+                return
+        elif action == DropKid:
+            agent.loading.loaded_by = None
+            agent.loading = None
+        elif self.valid_pos(ax + mx, ay + my) and self.floor[ax + mx][ay + my] != ObstacleCell and not any([ other.x == ax + mx and other.y == ay + my for other in self.agents ]):
+            if not self.occupy(ax + mx, ay + my):
+                agent.x += mx
+                agent.y += my
+                agent.loading.x += mx
+                agent.loading.y += my
+            elif not agent.loading:
+                kid = [ kid for kid in self.kids if kid.x == ax + mx and kid.y == ay + my ][0]
+                agent.loading = kid
+                kid.loaded_by = agent
+                agent.x += mx
+                agent.y += my
 
     def valid_pos(self, x, y):
         return x >= 0 and x < len(self.floor) and y >= 0 and y < len(self.floor[0])
