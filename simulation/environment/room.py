@@ -3,17 +3,10 @@ from random import randint, random
 from ..agents import Agent
 
 
-# Env Actions
-MovNorth, MovEast, MovSouth, MovWest, MovNorth2, MovEast2, MovSouth2, MovWest2, Hold, Clean, DropKid = range(11)
 
 # Env Floor Cells
 FreeCell, DirtyCell, CorralCell, ObstacleCell = range(4)
 
-# Directions
-dx = [1, 0, -1,  0]
-dy = [0, 1,  0, -1]
-edx = dx + [1, -1, -1,  1]
-edy = dy + [1, -1,  1, -1]
 
 # Env class
 class RoomEnv:
