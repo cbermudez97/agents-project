@@ -109,10 +109,10 @@ class RoomEnv:
         to_mess = 9 - len(kids_around)
         if len(kids_around) == 1: to_mess = 1
         if len(kids_around) == 2: to_mess = 3
-        cedx = list(edx)
-        cedy = list(edy)
+        cedx = list(dx)
+        cedy = list(dy)
         while to_mess and cedx:
-            pos = randint(0,len(cedx)-1)
+            pos = randint(0, min(3, len(cedx)-1))
             mx, my = cedx.pop(pos), cedy.pop(pos)
             if self.free_cell(x + mx, y + my) and not self.occupy(x + mx, y + my):
                 self.floor[x][y] = DirtyCell
@@ -133,8 +133,8 @@ class RoomEnv:
     def aply_agent_action(self, agent, action):
         if action >= DropKid and not agent.loading:
             raise ValueError('Invalid action to be aplied by agent.')
-        mx = edx[action]
-        my = edx[action]
+        mx = dx[action]
+        my = dy[action]
         ax = agent.x
         ay = agent.y
         if action == Hold:
@@ -144,14 +144,17 @@ class RoomEnv:
                 self.floor[ax][ay] = FreeCell
                 return
         elif action == DropKid:
-            agent.loading.loaded_by = None
-            agent.loading = None
+            if self.floor[ax][ay] != DirtyCell:
+                agent.loading.loaded_by = None
+                agent.loading = None
+            return
         elif self.valid_pos(ax + mx, ay + my) and self.floor[ax + mx][ay + my] != ObstacleCell and not any([ other.x == ax + mx and other.y == ay + my for other in self.agents ]):
             if not self.occupy(ax + mx, ay + my):
                 agent.x += mx
                 agent.y += my
-                agent.loading.x += mx
-                agent.loading.y += my
+                if agent.loading:
+                    agent.loading.x += mx
+                    agent.loading.y += my
             elif not agent.loading:
                 kid = [ kid for kid in self.kids if kid.x == ax + mx and kid.y == ay + my ][0]
                 agent.loading = kid
