@@ -18,6 +18,8 @@ class RoomEnv:
         self.agents = []
 
         # Statistics
+        self.ndirty = ndirt
+        self.free = columns*rows - nobstacles - ndirt - nkids
 
         # Add CorralCell
         x, y = 0, 0
@@ -82,7 +84,7 @@ class RoomEnv:
             self.aply_agent_action(agent, agent.action(self))
         for kid in self.kids:
             self.aply_kid_action(kid, kid.action(self))
-        if self.t % self.rt: self.randomize()
+        if not self.t % self.rt: self.randomize()
         self.t += 1
 
     def randomize(self):
@@ -116,6 +118,8 @@ class RoomEnv:
             mx, my = cedx.pop(pos), cedy.pop(pos)
             if self.free_cell(x + mx, y + my) and not self.occupy(x + mx, y + my):
                 self.floor[x][y] = DirtyCell
+                self.ndirty += 1
+                self.free -= 1 
                 to_mess -= 1
 
     def kid_push(self, x, y, mx, my):
@@ -142,6 +146,8 @@ class RoomEnv:
         elif action == Clean:
             if self.floor[ax][ay] == DirtyCell:
                 self.floor[ax][ay] = FreeCell
+                self.ndirty -= 1
+                self.free += 1
                 return
         elif action == DropKid:
             if self.floor[ax][ay] != DirtyCell:

@@ -9,3 +9,4 @@ class HumanRobot(Robot):
     def action(self, percept):
         op = input('Option:')
         return int(op)
+        
