@@ -16,6 +16,7 @@ class RoomEnv:
         self.rt = rand_time
         self.kids = []
         self.agents = []
+        self.nobs = nobstacles
 
         # Statistics
         self.ndirty = ndirt
@@ -88,7 +89,68 @@ class RoomEnv:
         self.t += 1
 
     def randomize(self):
-        pass
+        old_floor = self.floor
+        self.floor = [[FreeCell]*len(old_floor[0]) for _ in range(len(old_floor))]
+        rows = len(old_floor)
+        columns = len(old_floor[0])
+
+        # Add CorralCell
+        x, y = 0, 0
+        while True:
+            x, y = (randint(0, rows-1), randint(0, columns-1))
+            if self.floor[x][y] != FreeCell:
+                continue
+            self.floor[x][y] = CorralCell
+            break
+        self.build_corral(x, y, len(self.kids)-1)
+
+        # Add DirtyCells
+        for _ in range(self.ndirty):
+            while True:
+                x, y = (randint(0, rows-1), randint(0, columns-1))
+                if self.floor[x][y] != FreeCell:
+                    continue
+                self.floor[x][y] = DirtyCell
+                break
+
+        # Add ObstacleCell
+        for _ in range(self.nobs):
+            while True:
+                x, y = (randint(0, rows-1), randint(0, columns-1))
+                if self.floor[x][y] != FreeCell:
+                    continue
+                self.floor[x][y] = ObstacleCell
+                break
+        
+        # Add Kids
+        for kid in self.kids:
+            if old_floor[kid.x][kid.y] == CorralCell:
+                for row in len(self.floor):
+                    for col in len(self.floor[row]):
+                        if self.floor[row][col] == CorralCell and not self.occupy(row, col):
+                            kid.x = row
+                            kid.y = col
+            else:
+                while True:
+                    x, y = (randint(0, rows-1), randint(0, columns-1))
+                    if self.floor[x][y] != FreeCell or self.occupy(x, y):
+                        continue
+                    kid.x = x
+                    kid.y = y
+                    break
+        
+        # Add agents
+        for agent in self.agents:
+            while True:
+                x, y = (randint(0, rows-1), randint(0, columns-1))
+                if self.floor[x][y] != FreeCell or self.occupy(x, y) :
+                    continue
+                agent.x = x
+                agent.y = y
+                if agent.loading:
+                    agent.loading.x = x
+                    agent.loading.y = y
+                break
 
     def is_clean(self):
         for row in self.floor:
