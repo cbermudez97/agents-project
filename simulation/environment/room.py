@@ -90,6 +90,13 @@ class RoomEnv:
     def randomize(self):
         pass
 
+    def is_clean(self):
+        for row in self.floor:
+            for cell in row:
+                if cell == DirtyCell:
+                    return False
+        return all( self.floor[kid.x][kid.y] == CorralCell for kid in self.kids)
+    
     def aply_kid_action(self, kid, action):
         if not action in [ MovNorth, MovSouth, MovWest, MovEast, Hold]:
             raise ValueError('Invalid action to be aplied by kid.')
