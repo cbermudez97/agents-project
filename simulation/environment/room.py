@@ -125,8 +125,8 @@ class RoomEnv:
         # Add Kids
         for kid in self.kids:
             if old_floor[kid.x][kid.y] == CorralCell:
-                for row in len(self.floor):
-                    for col in len(self.floor[row]):
+                for row in range(len(self.floor)):
+                    for col in range(len(self.floor[row])):
                         if self.floor[row][col] == CorralCell and not self.occupy(row, col):
                             kid.x = row
                             kid.y = col
