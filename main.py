@@ -3,12 +3,16 @@ from simulation.environment import RoomEnv
 
 
 
-def test_agent_model(agent_model, ntest=30):
+def test_agent_model(agent_model, ntest=30, args=None, kwargs=None):
     victory = 0
     defeat  = 0
     tie     = 0
+    uargs = (10, 10, 3, 1, 3, 3, agent_model, KidAgent)
+    ukwargs = { 'rand_time':100 }
+    if args: uargs = args
+    if kwargs: ukwargs = kwargs
     for _ in range(ntest):
-        room = RoomEnv(10, 10, 3, 1, 3, 3, agent_model, KidAgent, rand_time=100)
+        room = RoomEnv(*uargs, **ukwargs)
         while True:
             total_free_cells = room.ndirty + room.free
             if (room.ndirty/total_free_cells) * 100 >= 40:
@@ -21,9 +25,9 @@ def test_agent_model(agent_model, ntest=30):
                 tie += 1
                 break
             room.step()
-    return victory, defeat, tie
+    print(f'Testing {agent_model.__name__}:')
+    print(f'The robot has win in {victory} times.')
+    print(f'The robot has lose in {defeat} times.')
+    print(f'The simulations has end inconclusive in {tie} times.')
 
-v, d, t = test_agent_model(ModelReflexRobot)
-print(f'El robot a ganado en {v} ocasiones.')
-print(f'El robot a perdido en {d} ocasiones.')
-print(f'La simulacion a terminado inconclusa en {t} ocasiones.')
+test_agent_model(ModelReflexRobot)
