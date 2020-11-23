@@ -1,6 +1,5 @@
 from random import randint, random
 
-from ..agents import Robot
 from .env_actions import *
 
 
