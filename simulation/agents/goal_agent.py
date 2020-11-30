@@ -21,7 +21,7 @@ class GoalRobot(Robot):
 
     def consider_goal(self, percept:RoomEnv):
         if self.model.t % percept.rt == percept.rt - 1: self.model.goal = None
-        if self.model.gt >= percept.rt // 3: self.model.goal = None
+        if self.model.gt >= percept.rt // 3: self.model.goal = None; self.model.gt = 0
         if not self.model.goal:
             if (percept.ndirty/(percept.ndirty + percept.free)) * 100 >= 30:
                 return CLEAN

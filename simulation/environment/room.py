@@ -243,7 +243,7 @@ class RoomEnv:
         return any(agent.x == x and agent.y == y for agent in self.agents + self.kids) 
 
     def free_cell(self, x, y):
-        return self.valid_pos(x, y) and self.floor[x][x] == FreeCell
+        return self.valid_pos(x, y) and self.floor[x][y] == FreeCell
 
     def __str__(self):
         result = ''
