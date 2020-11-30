@@ -8,7 +8,7 @@ class Robot(Agent):
         super(Robot, self).__init__(x, y)
         self.loading = None
 
-    def find_nearest(self, percept:RoomEnv, cell_type):
+    def find_nearest(self, percept:RoomEnv, cell_type, baby=False, agent=False):
         queue = [(self.x, self.y, Hold)]
         visit = dict()
         visit[self.x, self.y] = True
@@ -27,7 +27,9 @@ class Robot(Agent):
                     and not any([ a.x == mov[0] and a.y == mov[1] for a in percept.agents ]) \
                     and not (percept.floor[mov[0]][mov[1]] == CorralCell \
                         and any([k.x == mov[0] and k.y == mov[1] for k in percept.kids])):
-                    if percept.floor[ax + mx][ay + my] == cell_type:
+                    if percept.floor[ax + mx][ay + my] == cell_type \
+                        or (baby and any([k.x == mov[0] and k.y == mov[1] for k in percept.kids])) \
+                        or (agent and any([k.x == mov[0] and k.y == mov[1] for k in percept.agents])):
                         return ufac
                     visit[mov] = True
                     queue.append((*mov, ufac))
@@ -57,7 +59,9 @@ class Robot(Agent):
                                 and not any([ a.x == mov[0] and a.y == mov[1] for a in percept.agents ]) \
                                 and not (percept.floor[mov[0]][mov[1]] == CorralCell \
                                     and any([k.x == mov[0] and k.y == mov[1] for k in percept.kids])):
-                                if percept.floor[ax + mx][ay + my] == cell_type:
+                                if percept.floor[ax + mx][ay + my] == cell_type \
+                                    or (baby and any([k.x == mov[0] and k.y == mov[1] for k in percept.kids])) \
+                                    or (agent and any([k.x == mov[0] and k.y == mov[1] for k in percept.agents])):
                                     return ufac
                                 visit[mov] = True
                                 queue.append((*mov, ufac))

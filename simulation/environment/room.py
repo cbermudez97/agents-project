@@ -80,12 +80,12 @@ class RoomEnv:
                     size -= 1
 
     def step(self):
+        self.t += 1
         for agent in self.agents:
             self.aply_agent_action(agent, agent.action(self))
         for kid in self.kids:
             self.aply_kid_action(kid, kid.action(self))
         if not self.t % self.rt: self.randomize()
-        self.t += 1
 
     def randomize(self):
         old_floor = self.floor
